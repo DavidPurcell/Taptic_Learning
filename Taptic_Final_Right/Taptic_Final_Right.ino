@@ -24,18 +24,17 @@ const int badLedDigitalOutPin = 10;
 const int onOffDigitalInPin = 13;
 
 // -1 = Back, 0 = Nothing, 1 = Front.
-const int steps[] = {0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1,
-                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                     -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-                     0, 0, 0, -1, 0, 0, 0, 0, 0, -1, 0, 0, 0, -1, 0, 0, 0, 0, 0, -1, 0, 0, 0, -1,
-                     0, 0, 0, -1};
+const int steps[] = {0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     -1, -1, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1, 0, 0, 0, 0, 0};
 const int stepDelay = 200;
 const int pauseDelay = 200;
 const int stepCount = sizeof(steps) / sizeof(int);
 long time = 0;
 
 long stepInitialTapTime[stepCount];
-const float acceptedAccuracy = .50;
+const float acceptedAccuracy = .33;
 
 void setup() {
   // put your setup code here, to run once:
@@ -92,7 +91,9 @@ void loop() {
     // Indicate Failure
     Serial.println("Accurracy Failure");
     Serial.println(accuracy);
-    digitalWrite(badLedDigitalOutPin, HIGH);
+    if(onOffDigitalInPin == HIGH){
+      digitalWrite(badLedDigitalOutPin, HIGH); 
+    }
   }
   clearTapTimes();
   delay(5000);
