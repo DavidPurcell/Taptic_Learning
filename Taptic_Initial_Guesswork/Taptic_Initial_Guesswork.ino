@@ -9,9 +9,10 @@ const int backDigitalInPin = A3;
 
 // -1 = Back, 0 = Nothing, 1 = Front.
 const int steps[] = {-1, 0, 0, 0, 1}
+const int stepCount = 5;
 const int stepDelay = 1000;
 
-const long stepInitialTapTime = [steps.length];
+const long stepInitialTapTime = [sizeof(steps)];
 const float acceptedAccuracy = .5;
 
 void setup() {
@@ -22,7 +23,7 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   long time = millis();
-  for (int i=0; i <= steps.length; i++){
+  for (int i=0; i <= stepCount; i++){
     long endTime = time + stepDelay * i;
     int nextStep = steps[i];
     bool hasTapped = false;

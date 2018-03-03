@@ -1,34 +1,32 @@
-const int onIntensity = 100;
-const int offIntensity = 0;
+const int onIntensity = HIGH;
+const int offIntensity = LOW;
 
-const int frontAnalogOutPin = A0;
-const int backAnalogOutPin = A1;
+const int frontDigitalOutPin = 9;
+const int backDigitalOutPin = 10
+;
 
 // -1 = Back, 0 = Nothing, 1 = Front.
-const int steps[] = {-1, 0, 0, 0, 1}
-const int stepDelay = 1000;
+const int steps[] = {0, -1, 0, 0, -1, 0, -1, -1, -1, 0};
+const int stepDelay = 250;
+const int stepCount = sizeof(steps) / sizeof(int);
 
 void setup() {
   // put your setup code here, to run once:
-  
+  Serial.begin(9600);
+  pinMode(frontDigitalOutPin, OUTPUT);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
   long time = millis();
-  for (int i=0; i <= steps.length; i++){
+  for (int i=0; i < stepCount; i++){
     long endTime = time + stepDelay * i;
     int nextStep = steps[i];
+    Serial.println(nextStep);
     while(millis() < endTime){
       runStep(nextStep, i);
     }
-  }
-
-  float accuracy = calculateAccuracy();
-  if(accuracy > acceptedAccuracy){
-    //Indicate victory
-  } else {
-    // Indicate Failure
+    clearMotors();
   }
 }
 
@@ -37,18 +35,17 @@ void runStep(int step, int stepNumber){
   // Setup correct input and output pins based on what the step is.
   int targetMotor = 0;
   if(step == -1){
-    targetMotor = frontAnalogOutPin;
+    targetMotor = frontDigitalOutPin;
   } else if (step == 1){
-    targetMotor = backAnalogOutPin;
+    targetMotor = backDigitalOutPin;
   } else {
     return;
   }
-
-  analogWrite(targetMotor, onIntensity);
+  digitalWrite(targetMotor, onIntensity);
 }
 
-voic clearMotors(){
-  analogWrite(frontAnalogOutPin, offIntensity);
-  analogWrite(backAnalogOutPin, offIntensity);
+void clearMotors(){
+  digitalWrite(frontDigitalOutPin, offIntensity);
+  digitalWrite(backDigitalOutPin, offIntensity);
 }
 
