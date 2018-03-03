@@ -1,46 +1,53 @@
-const int onIntensity = 100;
-const int offIntensity = 0;
+const int onIntensity = HIGH;
+const int offIntensity = LOW;
 
-const int frontAnalogOutPin = A0;
-const int backAnalogOutPin = A1;
+const int frontDigitalOutPin = 9;
+const int backDigitalOutPin = 10;
 
-const int frontDigitalInPin = A2;
-const int backDigitalInPin = A3;
+const int frontDigitalInPin = 8;
+const int backDigitalInPin = 7;
 
 // -1 = Back, 0 = Nothing, 1 = Front.
-const int steps[] = {-1, 0, 0, 0, 1}
-const int stepCount = 5;
-const int stepDelay = 1000;
+const int steps[] = {0, -1, 0, 0, -1, 0, -1, -1, -1, 0, 1, 0, 1};
+const int stepDelay = 250;
+const int stepCount = sizeof(steps) / sizeof(int);
 
-const long stepInitialTapTime = [sizeof(steps)];
+long stepInitialTapTime[stepCount];
 const float acceptedAccuracy = .5;
 
 void setup() {
   // put your setup code here, to run once:
-  
+  Serial.begin(9600);
+  pinMode(frontDigitalOutPin, OUTPUT);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
   long time = millis();
-  for (int i=0; i <= stepCount; i++){
+  for (int i=0; i < stepCount; i++){
     long endTime = time + stepDelay * i;
     int nextStep = steps[i];
     bool hasTapped = false;
+    long startTime = millis();
+    Serial.println(nextStep);
     while(millis() < endTime){
       runStep(nextStep, i);
       if(!hasTapped){
         hasTapped = checkForTap(nextStep);
-        stepInitialTapTime[i] = millis();
+        long timeDifference = millis() - startTime;
+        stepInitialTapTime[i] = abs(timeDifference);
       }
     }
+    clearMotors();
   }
-
   float accuracy = calculateAccuracy();
   if(accuracy > acceptedAccuracy){
-    //Indicate victory
+    Serial.println("Accurracy Success");
+    Serial.println(accuracy);
   } else {
     // Indicate Failure
+    Serial.println("Accurracy Failure");
+    Serial.println(accuracy);
   }
 }
 
@@ -49,18 +56,18 @@ void runStep(int step, int stepNumber){
   // Setup correct input and output pins based on what the step is.
   int targetMotor = 0;
   if(step == -1){
-    targetMotor = frontAnalogOutPin;
+    targetMotor = frontDigitalOutPin;
   } else if (step == 1){
-    targetMotor = backAnalogOutPin;
+    targetMotor = backDigitalOutPin;
   } else {
     return;
   }
-
-  analogWrite(targetMotor, onIntensity);
+  digitalWrite(targetMotor, onIntensity);
 }
 
 // Check if there has been a tap on the target foot
-bool checkForTap(){
+bool checkForTap(int step){
+  int targetReceiver = 0;
   if(step == -1){
     targetReceiver = frontDigitalInPin;
   } else if (step == 1){
@@ -74,16 +81,16 @@ bool checkForTap(){
 
 float calculateAccuracy(){
   long deltaSum = 0;
-  for (int i=0; i <= steps.length; i++){
+  for (int i=0; i <= stepCount; i++){
     long delta = (i * stepDelay) - stepInitialTapTime[i]; 
     deltaSum += delta;
   }
   
-  return ((float)deltaSum)/steps.length; 
+  return (((float)deltaSum)/stepCount) / stepDelay;
 }
 
-voic clearMotors(){
-  analogWrite(frontAnalogOutPin, offIntensity);
-  analogWrite(backAnalogOutPin, offIntensity);
+void clearMotors(){
+  digitalWrite(frontDigitalOutPin, offIntensity);
+  digitalWrite(backDigitalOutPin, offIntensity);
 }
 
