@@ -7,8 +7,14 @@ const int backDigitalOutPin = 12;
 const int frontDigitalInPin = 8;
 const int backDigitalInPin = 7;
 
+const int onOffDigitalInPin = 13;
+
 // -1 = Back, 0 = Nothing, 1 = Front.
-const int steps[] = {0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1};
+const int steps[] = {0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+                     0, 0, 0, -1, 0, 0, 0, 0, 0, -1, 0, 0, 0, -1, 0, 0, 0, 0, 0, -1, 0, 0, 0, -1,
+                     0, 0, 0, -1};
 const int stepDelay = 200;
 const int pauseDelay = 200;
 const int stepCount = sizeof(steps) / sizeof(int);
@@ -21,32 +27,36 @@ void setup() {
   Serial.begin(9600);
   pinMode(frontDigitalOutPin, OUTPUT);
   pinMode(backDigitalOutPin, OUTPUT);
+  pinMode(onOffDigitalInPin, INPUT);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
   long time = millis();
-  for (int i=0; i < stepCount; i++){
-    int nextStep = steps[i];
-    long endTime = time;
-    if(nextStep == 0){
-      endTime += pauseDelay * i;
-    } else {
-      endTime += stepDelay * i;
-    }
-    
-    bool hasTapped = false;
-    long startTime = millis();
-    Serial.println(nextStep);
-    while(millis() < endTime){
-      runStep(nextStep, i);
-      if(!hasTapped){
-        hasTapped = checkForTap(nextStep);
-        long timeDifference = millis() - startTime;
-        stepInitialTapTime[i] = abs(timeDifference);
+  int onOff = digitalRead(onOffDigitalInPin);
+  if(onOff == HIGH){
+    for (int i=0; i < stepCount; i++){
+      int nextStep = steps[i];
+      long endTime = time;
+      if(nextStep == 0){
+        endTime += pauseDelay * i;
+      } else {
+        endTime += stepDelay * i;
       }
+      
+      bool hasTapped = false;
+      long startTime = millis();
+      Serial.println(nextStep);
+      while(millis() < endTime){
+        runStep(nextStep, i);
+        if(!hasTapped){
+          hasTapped = checkForTap(nextStep);
+          long timeDifference = millis() - startTime;
+          stepInitialTapTime[i] = abs(timeDifference);
+        }
+      }
+      clearMotors();
     }
-    clearMotors();
   }
   float accuracy = calculateAccuracy();
   if(accuracy > acceptedAccuracy){

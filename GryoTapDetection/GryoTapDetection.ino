@@ -4,21 +4,21 @@
 
 Adafruit_L3GD20 gyro(16, 17, 18, 19);
 
-static int xBackLowerThreshold = -255;
-static int yBackLowerThreshold = 20;
-static int zBackLowerThreshold = -255;
+static int xBackLowerThreshold = -100;
+static int yBackLowerThreshold = 0;
+static int zBackLowerThreshold = -50;
 
-static int xBackUpperThreshold = 255;
-static int yBackUpperThreshold = 70;
-static int zBackUpperThreshold = 255;
+static int xBackUpperThreshold = 0;
+static int yBackUpperThreshold = 100;
+static int zBackUpperThreshold = 50;
 
-static int xFrontLowerThreshold = -255;
-static int yFrontLowerThreshold = -70;
-static int zFrontLowerThreshold = -255;
+static int xFrontLowerThreshold = 0;
+static int yFrontLowerThreshold = 0;
+static int zFrontLowerThreshold = 0;
 
-static int xFrontUpperThreshold = 255;
-static int yFrontUpperThreshold = -20;
-static int zFrontUpperThreshold = 255;
+static int xFrontUpperThreshold = 0;
+static int yFrontUpperThreshold = 0;
+static int zFrontUpperThreshold = 0;
 
 void setup(void) 
 {
@@ -46,7 +46,7 @@ void loop(void)
   } else if(tapResult == -1){
     Serial.println("FRONT TAP");
   }
-  delay(200);
+  delay(100);
   
 }
 
