@@ -91,9 +91,7 @@ void loop() {
     // Indicate Failure
     Serial.println("Accurracy Failure");
     Serial.println(accuracy);
-    if(onOffDigitalInPin == HIGH){
-      digitalWrite(badLedDigitalOutPin, HIGH); 
-    }
+    digitalWrite(badLedDigitalOutPin, HIGH); 
   }
   clearTapTimes();
   delay(5000);
